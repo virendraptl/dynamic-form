@@ -63,9 +63,10 @@ export class AppComponent implements OnInit {
       }
     }
   }
+  
 
   submitResult() {
-    console.log(this.resultForm.value);
+    console.log('Final form result:',this.resultForm.value);
   }
 
   submitBuilder() {
