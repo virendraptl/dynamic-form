@@ -1,0 +1,108 @@
+<div class="page">
+  <form [formGroup]="buildForm" (ngSubmit)="submitBuilder()">
+    <div class="creator block">
+      <label for="">Label</label>
+      <input formControlName="label" type="text" />
+      <!-- <input formControlName="type" type="text" /> -->
+      <label for="">Control-Name</label>
+      <input formControlName="controlTitle" type="text" />
+      <label for="">Type</label>
+      <select name="type" formControlName="type" id="type">
+        <option value="" disabled selected>Select your option</option>
+        <option value="text">Text</option>
+        <option value="email">Email</option>
+        <option value="number">Number</option>
+        <option value="password">Password</option>
+        <option value="dropdown">Dropdown List</option>
+        <option value="checkbox">Checkbox</option>
+        <option value="radio">Radio buttons</option>
+      </select>
+      <ng-container
+        *ngIf="
+          type.value == 'dropdown' ||
+          type.value == 'checkbox' ||
+          type.value == 'radio'
+        "
+      >
+        <label for="">Values for {{ type.value }}</label>
+        <span>seperated by comma(,)</span>
+        <input formControlName="values" type="text" />
+      </ng-container>
+      <label for="">Input field status:</label>
+      <div>
+        <input type="radio" formControlName="status" [value]="true" />
+        <label>Mandatory</label>
+      </div>
+      <div>
+        <input type="radio" formControlName="status" [value]="false" />
+        <label>Optional</label>
+      </div>
+      <button>Add Field</button>
+    </div>
+  </form>
+  <form [formGroup]="resultForm" (ngSubmit)="submitResult()">
+    <div *ngIf="controlArr.length > 0" class="result block">
+      <div *ngFor="let item of controlArr; let i = index">
+        <label>{{ item.label | titlecase }}</label>
+        <br />
+        <ng-container
+          *ngIf="
+            item.type != 'dropdown' &&
+            item.type != 'checkbox' &&
+            item.type != 'radio'
+          "
+        >
+          {{ item.type }}
+          <input [type]="item['type']" [formControlName]="item.controlTitle" />
+        </ng-container>
+        <ng-container *ngIf="item.type == 'dropdown'">
+          <select
+            name="item.controlTitle"
+            [formControlName]="item.controlTitle"
+            id="item.controlTitle"
+          >
+            <option value="" disabled selected>Select your option</option>
+            <ng-container *ngFor="let menu of item.values.split(',')">
+              <option [value]="menu.trim()">
+                {{ menu.trim() | titlecase }}
+              </option>
+            </ng-container>
+          </select>
+        </ng-container>
+        <ng-container *ngIf="item.type == 'radio'">
+          <ng-container *ngFor="let radio of item.values.split(',')">
+            <input
+              type="radio"
+              [formControlName]="item.controlTitle"
+              [value]="radio"
+            />
+            <label>{{ radio | titlecase }}</label>
+            <br />
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="item.type == 'checkbox'">
+          <ng-container *ngFor="let check of item.values.split(',')">
+            <label>
+              <input
+                type="checkbox"
+                [value]="check"
+                (change)="controlOnChange($event, item.controlTitle)"
+              />
+              {{ check | titlecase }}
+            </label>
+          </ng-container>
+        </ng-container>
+        <br />
+        <small
+          *ngIf="
+            resultForm.get(item.controlTitle).invalid &&
+            resultForm.get(item.controlTitle).touched
+          "
+          >{{ errorMsg(i) }}</small
+        >
+        <br />
+      </div>
+      <button [disabled]="resultForm.invalid">Submit</button>
+    </div>
+  </form>
+</div>
